@@ -1,65 +1,58 @@
 import '../scss/main.scss';
-const petsData = [
+// ASYNCHRONOUS
+// JAVASCRIPT
+//  AND
+// XML
+const btn = document.querySelector('.button');
+const animalCountainer = document.querySelector('.animal-info')
+let pageCounter = 1;
+btn.addEventListener("click", function () {
+  let ourRequest = new XMLHttpRequest();
+  ourRequest.open('GET'/* GET or POST */, 'https://learnwebcode.github.io/json-example/animals-' + pageCounter + '.json');
+  ourRequest.onload = function () {
+  if( ourRequest.status >= 200 && ourRequest.status < 500)
+    {
+      let ourData = JSON.parse(ourRequest.responseText);
+    renderHTML(ourData);
+  } else
   {
-    name: "Purrsloud",
-    species: "Cat",
-    favFoods: ["wet food", "dry food", "<strong>any</strong> food"],
-    birthYear: 2020,
-    photo: "https://learnwebcode.github.io/json-example/images/cat-2.jpg"
-  },
-  {
-    name: "Barksalot",
-    species: "Dog",
-    birthYear: 2019,
-    photo: "https://learnwebcode.github.io/json-example/images/dog-1.jpg"
-  },
-  {
-    name: "Meowsalot",
-    species: "Cat",
-    favFoods: ["tuna", "catnip", "celery"],
-    birthYear: 2012,
-    photo: "https://learnwebcode.github.io/json-example/images/cat-1.jpg"
+    alert("we connected to the server, but it returned an error");
   }
-];
-function foods(foods) {
-  return `
-      <h4>Favorite foods:</h4>
-      <ul class = "foods-list">
-      ${foods.map((food) => `<li>${food} </li>` ).join(" ")}
-      </ul>
-      `
-     }
-function age(birthYear) {
+  }
+  ourRequest.send();
+  pageCounter++;
+  if (pageCounter > 3) {
+    btn.classList.add("hide-me");
 
-  let calculatedAge = new Date().getFullYear() - birthYear;
-  if (calculatedAge == 1) {
-    return '1 year old '
-  } else if (calculatedAge == 0) {
-    return 'less then 1 year'
-  } else {
-    return `${calculatedAge} years old`
+  }
+})
+
+function renderHTML(data) {
+
+  let htmlString = " ";
+  for (let i = 0; i < data.length; i++) {
+    htmlString += "<p>" + data[i].name + " is a " + data[i].species + "likes to eat "
+    for (let ii = 0; ii < data[i].foods.likes.length; ii++) {
+      if (ii == 0) {
+        htmlString += data[i].foods.likes[ii];
+      } else {
+        htmlString += " and " + data[i].foods.likes[ii];
+      }
+    }
+    htmlString += "and dislikes ";
+     for (let ii = 0; ii < data[i].foods.dislikes.length; ii++) {
+      if (ii == 0) {
+        htmlString += data[i].foods.dislikes[ii];
+      } else {
+        htmlString += " and " + data[i].foods.dislikes[ii];
+      }
+    }
+    htmlString += ".</p>"
+
+
   }
 
+
+  animalCountainer.insertAdjacentHTML('beforeend', htmlString);
 
 }
-function petTemplate(pet) {
-  return `
-    <div class="animal">
-    <img class="pet-photo" src = "${pet.photo}"
-    <h2 class="pet-name">${pet.name}
-     <span class="spiecies">(${pet.species})</span></h2>
-    <p>Age:<strong> ${age(pet.birthYear)}</strong></p>
-
-
-       ${pet.favFoods ? foods(pet.favFoods) : ''}
-        </div>
-    `
-}
-
-document.getElementById("app").innerHTML = `
-<h1 class= "pets-title">pets (${petsData.length}) results</h1>
-${petsData.map(petTemplate).join("  ")}
-<p class= "footer"> These ${petsData.length} were added recently, chceck back soon for updates.
-</p>
-`;
-// backtick - Tamplate litelrals, nie wymaga <br/>
